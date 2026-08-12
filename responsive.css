@@ -1,0 +1,227 @@
+/* TABLETS — max-width: 1024px   */
+@media (max-width: 1024px) {
+
+    .hero {
+        align-items: center;
+        flex-direction: column;
+        text-align: start;
+        height: auto;
+        gap: 20px;
+    }
+
+    .right img {
+        width: 280px;
+    }
+
+    .left h1 {
+        font-size: 50px;
+    }
+
+    .left p {
+        font-size: 25px;
+    }
+
+    .achievements {
+        gap: 40px;
+    }
+
+    .bookservice {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .leftservice,
+    .rightservice {
+        width: 80%;
+    }
+
+    .leftservice{
+        margin-bottom: 20px;
+    }
+
+    .newsletter {
+        padding: 30px 20px;
+        gap: 20px;
+        text-align: center;
+        flex-direction: column;
+        height: auto;
+    }
+
+    .subs input,
+    .subs button {
+        width: 60vw;
+    }
+
+    .information {
+        gap: 60px;
+        flex-wrap: wrap;
+    }
+}
+
+
+/* MOBILE — max-width: 768px     */
+
+@media (max-width: 768px) {
+
+    nav {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .section {
+        gap: 10px;
+    }
+
+    .hero {
+        padding: 80px 0;
+        padding-top: 100px;
+        gap: 20px;
+    }
+
+    .left h1 {
+        font-size: 28px;
+    }
+
+    .left p {
+        font-size: 18px;
+    }
+
+    .right img {
+        align-items: start;
+        width: 230px;
+    }
+
+    .achievements {
+        flex-direction: column;
+        padding: 20px;
+        height: auto;
+        gap: 15px;
+    }
+
+    .services {
+        gap: 20px;
+        font-size: 14px;
+    }
+
+    .bookservice {
+        padding: 20px;
+    }
+
+    .leftservice,
+    .rightservice {
+        width: 90%;
+        padding: 20px;
+    }
+
+    .About-us {
+        flex-direction: column;
+        padding: 20px;
+        text-align: center;
+        height: auto;
+    }
+
+    .value {
+        width: 80%;
+    }
+
+    .newsletter {
+        font-size: 16px;
+    }
+
+    .subs input,
+    .subs button {
+        width: 80vw;
+    }
+
+    .information {
+        flex-direction: column;
+        gap: 30px;
+        text-align: center;
+    }
+
+    .name{
+        font-size: 12px;
+    }
+
+    .price{
+        font-size: 12px;
+    }
+}
+
+/* SMALL PHONES — max-width: 480px          */
+@media (max-width: 480px) {
+
+    .hero{
+         gap: 50px;
+    }
+
+    .left p{
+        line-height: 2;
+    }
+
+    header {
+        padding: 15px;
+    }
+
+    .left h1 {
+        font-size: 24px;
+    }
+
+    .left p {
+        font-size: 16px;
+    }
+
+    .left button {
+        width: 100%;
+        padding: 12px;
+        border-radius: 12px;
+    }
+
+    .right img {
+        width: 180px;
+    }
+
+    .achievements {
+        font-size: 14px;
+    }
+
+    .leftservice,
+    .rightservice {
+        width: 95%;
+        padding: 15px;
+    }
+
+    .table-box {
+        max-height: 200px;
+        font-size: 12px;
+    }
+
+    .total-price {
+        gap: 50px;
+    }
+
+    .About-us {
+        padding: 10px;
+    }
+
+    .value {
+        width: 100%;
+    }
+
+    .newsletter {
+        padding: 20px;
+        font-size: 14px;
+    }
+
+    .subs input,
+    .subs button {
+        width: 80vw;
+        height: 6vh;
+        font-size: 16px;
+    }
+
+    footer {
+        padding: 10px;
+    }
+}
