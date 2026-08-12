@@ -1,165 +1,192 @@
-const EMAILJS_PUBLIC_KEY = "YCQ7lZUmZ8Iiv-Lyc";
-const EMAILJS_SERVICE_ID = "service_absokgp";
-const EMAILJS_TEMPLATE_ID = "template_nmb6rqn";
+let cart = []
+const inbox = document.querySelector('#inbox')
+const total = document.querySelector('.total')
+const inboxitem = document.querySelectorAll(".inbox-item")
+let update = document.querySelector("#update")
 
-if (window.emailjs && EMAILJS_PUBLIC_KEY !== "YOUR_PUBLIC_KEY") {
-    emailjs.init(EMAILJS_PUBLIC_KEY);
+updateTable()
+
+setupbutton()
+
+// add remove button
+async function setupbutton() {
+
+    inboxitem.forEach((e) => {
+
+        e.clickcount = 0;
+        const addbtn = e.querySelector('.addbtn')
+        if (!addbtn) return false
+        
+        addbtn.addEventListener('click', () => {
+            
+            update.innerHTML = "";
+            e.clickcount += 1
+
+            const name = e.querySelector('.name').textContent
+            let price = e.querySelector('.price').textContent
+
+            if (e.clickcount % 2 === 1) {
+                cart.push({ name, price })
+                addbtn.textContent = "Remove item"
+                addbtn.classList.add('removebtn')
+                addbtn.classList.remove('addbtn')
+            }
+
+            else {
+                const idx = cart.findIndex(i => i.name === name);
+                if (idx !== -1) cart.splice(idx, 1);
+
+                addbtn.textContent = "Add item"
+                addbtn.classList.remove('removebtn')
+                addbtn.classList.add('addbtn')
+            }
+            updateTable();
+
+        })
+    })
+
 }
 
-const services = [
-    { id: 1, name: "Dry Cleaning", price: 200, icon: "dry-cleaning.png" },
-    { id: 2, name: "Wash & Fold", price: 100, icon: "wash.png" },
-    { id: 3, name: "Ironing", price: 30, icon: "iron.png" },
-    { id: 4, name: "Stain Removal", price: 500, icon: "stain.png" },
-    { id: 5, name: "Leather & Suede Cleaning", price: 999, icon: "leather.png" },
-    { id: 6, name: "Wedding Dress Cleaning", price: 2800, icon: "wedding.png" },
-];
 
-let cart = [];
 
-const serviceListEl = document.getElementById("serviceList");
-
-function renderServiceList() {
-    serviceListEl.innerHTML = services.map(s => {
-        const inCart = cart.some(c => c.id === s.id);
-        return `
-            <div class="service-row">
-                <div class="service-info">
-                      <img src="${s.icon}" alt="${s.name}"
-                      class="service-icon" />
-                      <div class="service-text">
-                         <span class="name">${s.name}</span>
-                         <span class="price">&#8377;${s.price.toFixed(2)}</span>
-                      </div>
-                </div>
-                <button class="${inCart ? 'btn-remove' : 'btn-add'}"
-                data-id="${s.id}">
-                  ${inCart ? 'Remove &#8854;' : 'Add &#8853;'}
-                </button>
-            </div>
-        `;
-    }).join("");
-
-    serviceListEl.querySelectorAll("button").forEach(btn => {
-      btn.addEventListener("click", () => toggleService(Number(btn.dataset.id)));
-    });
+// clear price 
+function cleanPrice(p) {
+    return parseFloat(p.replace(/[^0-9.]/g, ''));
 }
 
-function toggleService(id) { 
-    const exists = cart.some(c => c.id === id);
-    if(exists){
-        cart = cart.filter(c => c.id !== id);
-    } else{
-        const svc = services.find(s => s.id === id);
-        cart.push(svc);
+
+// making item table
+async function updateTable() {
+
+    total.innerText = 0;
+
+    inbox.innerHTML = `<tr id="empty-row">
+                                <td id="inboxitem" colspan="3">
+                                    <div class="empty-box">
+                                        <div class="icon">i</div>
+                                        <h3>No Items Added</h3>
+                                        <p>Add items to the cart from the services bar</p>
+                                    </div>
+                                </td>
+                            </tr>`
+
+
+    if (cart.length > 0) {
+        let count = 0;
+
+        inbox.innerHTML = ``
+        cart.forEach((item, index) => {
+
+            let tr = document.createElement('tr')
+            tr.innerHTML = `
+        <tr>
+        <th>${index + 1}</th>
+        <td>${item.name}</td>
+        <td>${item.price}</td>
+        </tr>  `
+
+            inbox.appendChild(tr)
+            count += cleanPrice(item.price)
+
+        })
+
+        total.innerText = `₹${count}`
     }
-    renderServiceList();
-    renderCart();
+}
 
+function resetbuttons() {
+
+    document.querySelectorAll('.inbox-item').forEach(i => {
+        i.clickcount = 0
+
+        const addbtn = i.querySelector('button')
+        if (addbtn) {
+            addbtn.textContent = "Add item"
+            addbtn.classList.remove('removebtn')
+            addbtn.classList.add('addbtn')
+        }
+    })
+
+      if (cart.length !== 0) {
+        update.innerHTML = ``
+    }
+
+    else{
+         update.innerHTML = `<p class = "confirmation"> Your Services is Book </p>`
+    }
+}
+
+
+function formatOrder(cart) {
+    return cart.map((item, i) =>
+        `${i + 1}. ${item.name} - ${item.price}`
+    ).join('\n');
+}
+
+
+// book the service
+async function booknow() {
+    let mail = document.querySelector("#email").value
+    let phone = document.querySelector("#phone").value
+    let name = document.querySelector("#name").value
+
+    let myform = document.querySelector("#myform")
+
+
+    if (cart.length == 0) {
+        alert('add item')
+        update.innerHTML = ``
+    }
+
+    else {
+
+        myform.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const orderDetails = formatOrder(cart);
+            const totalAmount = total.innerText;
+            
+            sendMail(name , mail , orderDetails, totalAmount)
+            cart = []
+            updateTable()
+
+            clearinput(mail, phone, name)
+
+            resetbuttons()
+
+        })
+    }
 
 }
 
-const itemsTable = document.getElementById("itemsTable");
-const itemsTableBody = document.getElementById("itemsTableBody");
-const emptyCartMsg = document.getElementById("emptyCartMsg");
-const totalAmountEl = document.getElementById("totalAmount");
 
-function renderCart(){
-    if(cart.length === 0){
-        itemsTable.style.display = "none";
-        emptyCartMsg.style.display = "block";
-    } else{
-        itemsTable.style.display = "table";
-        emptyCartMsg.style.display ="none";
-        itemsTableBody.innerHTML = cart.map((item, idx) =>`
-         <tr>
-             <td>${idx + 1}</td>  
-             <td>${item.name}</td>
-             <td class="price">&#8377;${item.price.toFixed(2)}</td>
-        </tr>  
-        `).join("");
-    }
-    const total= cart.reduce((sum, item) => sum+ item.price,0);
-    totalAmountEl.textContent = total.toFixed(2);
+// clear input values
+async function clearinput(m, p, n) {
+    let mail = document.querySelector("#email").value = '';
+    let phone = document.querySelector("#phone").value = '';
+    let name = document.querySelector("#name").value = '';
 }
 
-// BOOKING
+// send confirmation mail
+function sendMail(name , email , orderDetails, totalAmount) {
 
-const bookingForm = document.getElementById("bookingForm");
-const bookNowBtn = document.getElementById("bookNowBtn");
-const thankYouMsg = document.getElementById("thankYouMsg");
-const navUsername = document.getElementById("navUsername");
+    const serviceID = "service_absokgp";     
+    const templateID = "template_nmb6rqn";   
 
-bookingForm.addEventListener("submit", function(e){e.preventDefault();
-    
-    if(cart.length === 0){
-        alert("Please add at least one service before booking.");
-        return;
-    }
-
-    const fullName = document.getElementById("fullName").value.trim();
-    const email = document.getElementById("emailId").value.trim();
-    const phone = document.getElementById("phoneNumber").value.trim();
-    const total = cart.reduce((sum, item) => sum + item.price, 0);
-    const serviceList = cart.map(c => `${c.name} (₹${c.price.toFixed(2)})`).join(",");
-
-    const templateParams = {
-        full_name: fullName,
-        email: email,
-        phone: phone,
-        services: serviceList,
-        total: `₹${total.toFixed(2)}`
+    const params = {
+        user_name: name,
+        user_email: email,
+        order_details: orderDetails,
+        total_amount: totalAmount
     };
 
-    bookNowBtn.disabled = true;
-    bookNowBtn.textContent = "Booking..";
-
-    const finish = () => {
-        navUsername.textContent = fullName|| "Guest";
-        thankYouMsg.classList.add("show");
-        bookingForm.reset();
-        cart = []
-        renderServiceList();
-        renderCart();
-        bookNowBtn.disabled = false;
-        bookNowBtn.textContent = "Book now";
-
-    };
-
-    if (window.emailjs && EMAILJS_PUBLIC_KEY !== "YOUR_PUBLIC_KEY") {
-        emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID,templateParams)
-          .then(finish)
-          .catch(err =>{
-             console.error("EmailJS error:", err);
-             alert("Booking saved, but the confirmation email could not be sent. Please check your EmailJS configuration.");
-             finish();
-          });
-    }  else {
+    return emailjs.send(serviceID, templateID, params)
+        .then(() => {
+            alert("Email sent successfully");
+        })
+        .catch((err) => {
+            console.error("Email error:", err);
+        });
+}
 
 
-        console.warn("EmailJS is not configured. Fill in EMAILJS_PUBLIC_KEY / SERVICE_ID / TEMPLATE_ID at the top of the <script> to enable real emails.");
-        setTimeout(finish,500);
-    }
-});
-
-
-document.getElementById("newsletterForm").addEventListener("submit",function(e){
-    e.preventDefault();
-    const name = document.getElementById("nlName").value.trim();
-    alert(`Thanks for subscribing,${name || "friend"}`);
-    this.reset();
-});
-
-document.getElementById("bookServiceBtn").addEventListener("click",() => {
-    document.getElementById("booking").scrollIntoView({behavior:"smooth"});
-});
-
-const navToggle = document.getElementById("navToggle");
-const navlinks = document.getElementById("navlinks");
-navToggle.addEventListener("click" , () => navlinks.classList.toggle     ("open"));
-navlinks.querySelectorAll("a").forEach(a =>
-     a.addEventListener("click", () => navlinks.classList.remove("open"))
-);
-
-renderServiceList();
-renderCart();
